@@ -1,0 +1,33 @@
+- name: Setup environment for ansible-worker
+  hosts: hosts.ini
+  become: yes
+  tasks:
+    - name: Create ansible-worker user
+      user:
+        name: ansible-worker
+        state: present
+
+    - name: Install Git
+      package:
+        name: git
+        state: present
+
+    - name: Copy SSH keys
+      copy:
+        src: ssh_keys/
+        dest: /home/ansible-worker/.ssh/
+      notify: Reload SSH
+
+    - name: Clone repository
+      git:
+        repo: "https://github.com/iphilka/stud-template.git"
+        dest: /home/ansible-worker/www/
+        clone: yes
+        force: yes
+      become_user: ansible-worker
+
+handlers:
+  - name: Reload SSH
+    service:
+      name: sshd
+      state: reloaded
