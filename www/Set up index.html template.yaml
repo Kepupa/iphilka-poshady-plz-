@@ -1,5 +1,5 @@
 - name: Set up index.html template
-  hosts: hosts.ini
+  hosts: all
   become: yes
   tasks:
     - name: Copy index.html template

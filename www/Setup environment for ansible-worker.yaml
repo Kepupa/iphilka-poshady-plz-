@@ -1,5 +1,5 @@
 - name: Setup environment for ansible-worker
-  hosts: hosts.ini
+  hosts: all
   become: yes
   tasks:
     - name: Create ansible-worker user

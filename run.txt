@@ -1,3 +1,3 @@
-ansible-playbook www/Setup environment for ansible-worker.yml -i hosts.ini
-ansible-playbook www/Set up index.html template.yml -i hosts.ini
-ansible-playbook www/Configure Nginx.yml -i hosts.ini 
+root_ansible-playbook www/Setup environment for ansible-worker.yml -i hosts.ini
+root_ansible-playbook www/Set up index.html template.yml -i hosts.ini
+root_ansible-playbook www/Configure Nginx.yml -i hosts.ini 
