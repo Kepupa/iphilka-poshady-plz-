@@ -1,0 +1,69 @@
+- name: Setup environment for ansible-worker
+  hosts: hosts.ini
+  become: yes
+  tasks:
+    - name: Create ansible-worker user
+      user:
+        name: ansible-worker
+        state: present
+
+    - name: Install Git
+      package:
+        name: git
+        state: present
+
+    - name: Copy SSH keys
+      copy:
+        src: ssh_keys/
+        dest: /home/ansible-worker/.ssh/
+      notify: Reload SSH
+
+    - name: Clone repository
+      git:
+        repo: "https://github.com/iphilka/stud-template.git"
+        dest: /home/ansible-worker/www/
+        clone: yes
+        force: yes
+      become_user: ansible-worker
+
+- name: Set up index.html template
+  hosts: hosts.ini
+  become: yes
+  tasks:
+    - name: Copy index.html template
+      template:
+        src: templates/index.html.j2
+        dest: /home/ansible-worker/www/stud-template/index.html
+      notify: Reload Nginx
+
+- name: Configure Nginx
+  hosts: hosts.ini
+  become: yes
+  tasks:
+    - name: Create directory for Nginx site config
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+
+    - name: Copy Nginx site config file
+      template:
+        src: templates/nginx_config.conf.j2
+        dest: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+      notify: Reload Nginx
+
+    - name: Enable Nginx site
+      file:
+        src: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+        dest: /etc/nginx/sites-enabled/ansible.iphilka.ru.conf
+        state: link
+
+handlers:
+  - name: Reload SSH
+    service:
+      name: sshd
+      state: reloaded
+
+  - name: Reload Nginx
+    service:
+      name: nginx
+      state: reloaded
